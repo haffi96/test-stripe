@@ -4,6 +4,7 @@ import { useStripe } from '@stripe/react-stripe-js';
 import { useState } from 'react';
 import { useContext } from 'react';
 import { StoreContext } from '@/lib/store';
+import { CircularProgress } from '@mui/material';
 
 const PaymentForm = () => {
     const stripe = useStripe();
@@ -14,11 +15,13 @@ const PaymentForm = () => {
     const [subscriptionId, setSubscriptionId] = useState('');
     const [subscriptionItemId, setSubscriptionItemId] = useState('');
     const [clientSecret, setClientSecret] = useState('')
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         // We don't want to let default form submission happen here,
         // which would refresh the page.
         event.preventDefault();
+        setLoading(true);
 
         const formData = new FormData()
         formData.append('name', name);
@@ -40,6 +43,7 @@ const PaymentForm = () => {
             setSubscriptionId(data.subscription_id);
             setSubscriptionItemId(data.subscription_item_id);
             setClientSecret(data.client_secret);
+            setLoading(false);
 
 
             store.customerId = data.customer_id;
@@ -62,15 +66,22 @@ const PaymentForm = () => {
                         <p> Client Secret: {clientSecret}</p>
                     </div>
                 ) :
-                    <form onSubmit={handleSubmit} className='flex flex-col w-full outline-dotted rounded-lg p-5 space-y-5'>
+                    <form
+                        onSubmit={handleSubmit}
+                        className='flex flex-col w-full outline-dotted rounded-lg p-5 space-y-5 justify-center'
+                    >
                         <p>
                             Customer Information
                         </p>
                         <input type='text' placeholder='Name' className='w-full text-black p-1 rounded' onChange={(e) => setName(e.target.value)} />
                         <input type='email' placeholder='Email' className='w-full text-black text-sm p-2 rounded' onChange={(e) => setEmail(e.target.value)} />
                         <button className='p-2 rounded-lg bg-blue-700' disabled={!stripe}>Submit</button>
+                        {loading && <CircularProgress />}
                     </form >
             }
+            <div>
+
+            </div>
         </div>
     )
 };

@@ -1,20 +1,23 @@
 'use client';
 
 import { useStripe } from '@stripe/react-stripe-js';
-import { MouseEventHandler, useState } from 'react';
+import { useState } from 'react';
 import { useContext } from 'react';
 import { StoreContext } from '@/lib/store';
+import { CircularProgress } from '@mui/material';
 
 const ModifySubscription = () => {
     const stripe = useStripe();
     const store = useContext(StoreContext);
     const [seats, setSeats] = useState('');
     const [updated, setUpdated] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: any) => {
         // We don't want to let default form submission happen here,
         // which would refresh the page.
         event.preventDefault();
+        setLoading(true);
 
         if (!stripe) {
             return;
@@ -41,6 +44,7 @@ const ModifySubscription = () => {
                     console.log(result.error.message);
                 } else {
                     setUpdated(true);
+                    setLoading(false);
                     console.log('🔔 Payment succeeded!');
                 }
             } else {
@@ -70,6 +74,9 @@ const ModifySubscription = () => {
                 >
                     Update
                 </button>
+                {
+                    loading && <CircularProgress />
+                }
             </div>
         </div>
     )

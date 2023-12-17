@@ -4,16 +4,19 @@ import { StoreContext } from '@/lib/store';
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import { CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
 import { useContext, useState } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const PaymentForm = () => {
     const stripe = useStripe();
     const elements = useElements();
     const store = useContext(StoreContext);
     const [added, setAdded] = useState(false);
+    const [loading, setLoading] = useState(false);
 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoading(true);
 
         if (!stripe || !elements) {
             return;
@@ -42,6 +45,7 @@ const PaymentForm = () => {
             setAdded(false);
         } else {
             console.log(result);
+            setLoading(false);
             setAdded(true);
         }
     };
@@ -68,6 +72,9 @@ const PaymentForm = () => {
                             >
                                 Subscribe
                             </button>
+                            {
+                                loading && <CircularProgress />
+                            }
                         </div>
                     </form >
             }
